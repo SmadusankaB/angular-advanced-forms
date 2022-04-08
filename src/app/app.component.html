@@ -1,0 +1,726 @@
+<mat-card>
+  <mat-card-title>TechPickups Advanced Forms</mat-card-title>
+
+  <form novalidate (ngSubmit)="onSubmit(pricingSetForm)" [formGroup]="pricingSetForm" role="form">
+    <mat-card-content class="mat-typography">
+      <div class="form-content">
+        <div class="field-container">
+          <div>
+            <div class="row">
+              <div class="col-md-3">
+                <mat-form-field class="form-fields">
+                  <mat-label>Group</mat-label>
+                  <mat-select formControlName="group" name="group">
+                    <mat-option *ngFor="let group of groups" [value]="group">
+                      {{group.viewValue}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                    {{errors.group}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field class="form-fields">
+                  <mat-label>Parking Category</mat-label>
+                  <mat-select formControlName="parking_category" name="category"
+                    (selectionChange)="onChangeAirport($event)">
+                    <mat-option *ngFor="let category of categories" [value]="category">
+                      {{category.viewValue}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                    {{errors.parking_category}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2">
+                <mat-form-field class="form-fields">
+                  <mat-label>Parking Type</mat-label>
+                  <mat-select formControlName="parking_type" name="type">
+                    <mat-option *ngFor="let type of parking_types" [value]="type">
+                      {{type.viewValue}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                    {{errors.parking_type}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2">
+                <mat-form-field class="form-fields">
+                  <mat-label>Pricing Type</mat-label>
+                  <mat-select formControlName="pricing_type" name="pricing_type"
+                    (selectionChange)="onChangePricingType($event)">
+                    <mat-option *ngFor="let pricing_type of pricing_types" [value]="pricing_type">
+                      {{pricing_type.viewValue}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                    {{errors.pricing_type}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2">
+                <mat-form-field class="form-fields">
+                  <span matPrefix>$ &nbsp;</span>
+                  <input type="number" min="0" formControlName="price" matInput placeholder="Price">
+                  <mat-error>
+                    {{errors.price}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row" *ngIf="showAirport">
+              <div class="col-md-3">
+                <mat-form-field class="form-fields">
+                  <mat-label>Which Airport is near you?</mat-label>
+                  <mat-select formControlName="airport_name" name="airport">
+                    <mat-option *ngFor="let airport of airports" [value]="airport">
+                      {{airport.viewValue}}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>
+                    {{errors.airport_name}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field class="form-fields">
+                  <input type="number" min="0" formControlName="distance_to_airport" matInput
+                    placeholder="Distance to Airport (in Miles)">
+                  <mat-error>
+                    {{errors.distance_to_airport}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <div class="form-array-plus-remove">
+                  <p>Shuttle Service is Available</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-array-plus-remove">
+                  <mat-radio-group formControlName="shuttle_service" (change)="radioChangeShuttleService($event)"
+                    aria-label="Select an option">
+                    <mat-radio-button value="shuttle_yes">Yes</mat-radio-button>
+                    <mat-radio-button value="shuttle_no">No</mat-radio-button>
+                  </mat-radio-group>
+                </div>
+              </div>
+            </div>
+            <div class="row" *ngIf="showShuttle">
+              <div class="col-md-12">
+                <mat-form-field class="form-fields">
+                  <textarea type="text" formControlName="shuttle_description" matInput
+                    placeholder="Shuttle Description"></textarea>
+                  <mat-error>
+                    {{errors.shuttle_description}}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div *ngIf="showPricingType" formGroupName="price_group">
+
+              <div class="upto_price mob-style">
+                <div class="row">
+                  <div class="col-md-12">
+                    <p><b>Upto Price</b></p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <button type="button" (click)="onClickUptoPrice($event)" mat-raised-button color="primary">+ Add new
+                      Upto Price</button>
+                  </div>
+                  <div class="col-md-3">
+                    <p>Is Custom Price?</p>
+                  </div>
+                  <div class="col-md-3">
+                    <mat-radio-group formControlName="custom_price" (change)="radioChangeCustomPrice($event)"
+                      aria-label="Select an option">
+                      <mat-radio-button value="custom_price_yes">Yes</mat-radio-button>
+                      <mat-radio-button value="custom_price_no">No</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+                <div class="row" *ngIf="uptoPricingFormA.controls.length>0">
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="price-title">
+                        <p><b>Weekday</b></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-6" style="padding-top: 16px;">
+                        <p><b>Overnight</b></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" *ngIf="uptoPricingFormA.controls.length>0">
+
+                  <div class="col-md-6 left-head text-center" *ngIf="!showCustomPrice">
+                    <div class="row">
+                      <div class="col-md-2">
+                        Start
+                      </div>
+                      <div class="col-md-2">
+                        End
+                      </div>
+                      <div class="col-md-2">
+                        Hours
+                      </div>
+                      <div class="col-md-2">
+                        Price
+                      </div>
+                      <div class="col-md-3">
+                        Action
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 left-head text-center" *ngIf="showCustomPrice">
+                    <div class="row">
+                      <div class="col-md-2">
+                        Start
+                      </div>
+                      <div class="col-md-2">
+                        End
+                      </div>
+                      <div class="col-md-4">
+                        Time
+                      </div>
+                      <div class="col-md-2" style="float: right;">
+                        Price
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 right-head text-center">
+                    <div class="row">
+                      <div class="col-md-2">
+                        Enable
+                      </div>
+                      <div class="col-md-2">
+                        Start
+                      </div>
+                      <div class="col-md-2">
+                        End
+                      </div>
+                      <div class="col-md-2">
+                        Price
+                      </div>
+                      <div class="col-md-2 text-left">
+                        Max Hours
+                      </div>
+                      <div class="col-md-2 text-left">
+                        Action
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div *ngFor="let num of uptoPricingFormA.controls; let j = index">
+                  <div [formGroup]="num | asFormGroup">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Start</mat-label>
+                              <mat-select formControlName="start_day" name="start_day">
+                                <mat-option *ngFor="let date of dates" [value]="date">
+                                  {{date.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.start_day}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>End</mat-label>
+                              <mat-select formControlName="end_day" name="end_day">
+                                <mat-option *ngFor="let date of dates" [value]="date">
+                                  {{date.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.end_day}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+
+                          <div class="col-md-8" *ngIf="!showCustomPrice">
+                            <div *ngFor="let price of getPriceInUptoPrice(num); let k = index">
+                              <div [formGroup]="price">
+                                <div class="row">
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <mat-label>Hour</mat-label>
+                                      <mat-select formControlName="hour" name="hour">
+                                        <mat-option *ngFor="let hour of hours" [value]="hour">
+                                          {{hour.viewValue}}
+                                        </mat-option>
+                                      </mat-select>
+                                      <mat-error>
+                                        {{errors.hour}}
+                                      </mat-error>
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <span matPrefix>$ &nbsp;</span>
+                                      <input type="number" min="0" formControlName="price_2" matInput
+                                        placeholder="Price">
+                                      <mat-error>
+                                        {{errors.price_2}}
+                                      </mat-error>
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="form-array-plus-remove" style="width: 64%;margin: auto;">
+                                      <button (click)="addNewPrice(j, k)" type="button" mat-icon-button>
+                                        <mat-icon>add</mat-icon>
+                                      </button>
+                                      <span class="app-spacer"></span>
+                                      <button *ngIf="k != 0" type="button" (click)="removeNewPrice(j, k)"
+                                        mat-icon-button>
+                                        <mat-icon>remove</mat-icon>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-8" *ngIf="showCustomPrice">
+                            <div *ngFor="let price of getPriceInUptoPrice(num); let k = index">
+                              <div [formGroup]="price">
+                                <div class="row">
+                                  <div class="col-md-3">
+                                    <div class="text-center" style="padding: 16px 0 0 0;">
+                                      <p>
+                                        First
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <input type="number" formControlName="first_time" matInput placeholder="Eg: 30">
+
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <mat-label>Type</mat-label>
+                                      <mat-select formControlName="first_type" name="minute">
+                                        <mat-option *ngFor="let minute of minutes" [value]="minute.value">
+                                          {{minute.viewValue}}
+                                        </mat-option>
+                                      </mat-select>
+
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <span matPrefix>$ &nbsp;</span>
+                                      <input type="number" min="0" formControlName="first_price" matInput
+                                        placeholder="">
+                                      <mat-error>
+                                        {{errors.price_2}}
+                                      </mat-error>
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-3">
+                                    <div class="text-center" style="padding: 16px 0 0 0;">
+                                      <p>
+                                        Every added
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <input type="number" formControlName="every_time" matInput placeholder="Eg: 1">
+
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <mat-label>Type</mat-label>
+                                      <mat-select formControlName="every_type" name="minute">
+                                        <mat-option *ngFor="let minute of minutes" [value]="minute.value">
+                                          {{minute.viewValue}}
+                                        </mat-option>
+                                      </mat-select>
+
+                                    </mat-form-field>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <mat-form-field class="form-fields">
+                                      <span matPrefix>$ &nbsp;</span>
+                                      <input type="number" min="0" formControlName="every_price" matInput
+                                        placeholder="">
+                                      <mat-error>
+                                        {{errors.price_2}}
+                                      </mat-error>
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-2">
+
+                          </div>
+                          <div class="col-md-2">
+
+                          </div>
+                          <div class="col-md-8">
+                            <div class="row" *ngIf="!showCustomPrice">
+                              <div class="col-md-3">
+                                <mat-form-field class="form-fields">
+                                  <mat-label>24</mat-label>
+                                  <mat-select formControlName="h24hour" name="hour">
+                                    <mat-option [value]="24">
+                                      24
+                                    </mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                              <div class="col-md-3">
+                                <mat-form-field class="form-fields">
+                                  <span matPrefix>$ &nbsp;</span>
+                                  <input type="number" min="0" formControlName="price24hour" matInput
+                                    placeholder="Price">
+                                  <mat-error>
+                                    {{errors.price_2}}
+                                  </mat-error>
+                                </mat-form-field>
+                              </div>
+                              <div class="col-md-6">
+                              </div>
+                            </div>
+                            <div class="row" *ngIf="showCustomPrice">
+                              <div class="col-md-3">
+
+                              </div>
+                              <div class="col-md-3">
+
+                              </div>
+                              <div class="col-md-6">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="row">
+
+                          <div class="col-md-2">
+                            <div class="form-check">
+                              <mat-checkbox formControlName="overtime_enable"></mat-checkbox>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Start</mat-label>
+                              <mat-select formControlName="overtime_start" name="overtime_start">
+                                <mat-option *ngFor="let time of times" [value]="time">
+                                  {{time.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.overtime_start}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>End</mat-label>
+                              <mat-select formControlName="overtime_end" name="overtime_end">
+                                <mat-option *ngFor="let time of times" [value]="time">
+                                  {{time.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.overtime_end}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <span matPrefix>$ &nbsp;</span>
+                              <input type="number" min="0" formControlName="overtime_price" matInput
+                                placeholder="Price">
+                              <mat-error>
+                                {{errors.price_2}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <input type="number" formControlName="max_hours" matInput placeholder="Max Hours">
+                              <mat-error>
+                                {{errors.max_hours}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-array-plus-remove">
+                              <button (click)="removeUptoPrice(j)" type="button" mat-icon-button>
+                                <mat-icon>remove</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="other_price mob-style">
+                <div class="row">
+                  <div class="col-md-12">
+                    <p><b>Other Pricing Type</b></p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <button type="button" (click)="onClickOtherPrice()" mat-raised-button color="primary">+ Add
+                      New
+                      Pricing Type</button>
+                  </div>
+                </div>
+                <div class="row" *ngIf="otherPricingFormA.controls.length > 0">
+                  <div class="col-md-6 left-head text-center">
+                    <div class="row">
+                      <div class="col-md-3">
+                        Pricing Type
+                      </div>
+                      <div class="col-md-9">
+                        Weekdays
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 right-head text-center">
+                    <div class="row">
+                      <div class="col-md-4">
+                        Check-In
+                      </div>
+                      <div class="col-md-4">
+                        Check-Out
+                      </div>
+                      <div class="col-md-2">
+                        Price
+                      </div>
+                      <div class="col-md-2">
+                        Action
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngFor="let other_pricing of otherPricingFormA.controls; let l = index">
+                  <div [formGroup]="other_pricing | asFormGroup">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Pricing Type</mat-label>
+                              <mat-select formControlName="other_pricing_type" name="otherPricingType">
+                                <mat-option *ngFor="let otherPricingType of otherPricingTypes"
+                                  [value]="otherPricingType">
+                                  {{otherPricingType.viewValue}}
+                                </mat-option>
+                              </mat-select>
+
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-4">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Weekday Start</mat-label>
+                              <mat-select formControlName="weekday_start" name="weekday_start">
+                                <mat-option *ngFor="let date of dates" [value]="date">
+                                  {{date.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.end_day}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-4">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Weekday End</mat-label>
+                              <mat-select formControlName="weekday_end" name="weekday_start">
+                                <mat-option *ngFor="let date of dates" [value]="date">
+                                  {{date.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.end_day}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Start</mat-label>
+                              <mat-select formControlName="checkin_start" name="checking_end">
+                                <mat-option *ngFor="let time of times" [value]="time">
+                                  {{time.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.overtime_start}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>End</mat-label>
+                              <mat-select formControlName="checking_end" name="checking_end">
+                                <mat-option *ngFor="let time of times" [value]="time">
+                                  {{time.viewValue}}
+                                </mat-option>
+                              </mat-select>
+                              <mat-error>
+                                {{errors.overtime_end}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Type</mat-label>
+                              <mat-select formControlName="checkout_type" name="checking_end">
+                                <mat-option *ngFor="let checkoutType of checkoutTypes" [value]="checkoutType">
+                                  {{checkoutType.viewValue}}
+                                </mat-option>
+                              </mat-select>
+
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <mat-label>Time</mat-label>
+                              <mat-select formControlName="checkout_time" name="checkout_time">
+                                <mat-option *ngFor="let time of times" [value]="time">
+                                  {{time.viewValue}}
+                                </mat-option>
+                              </mat-select>
+
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <mat-form-field class="form-fields">
+                              <span matPrefix>$ &nbsp;</span>
+                              <input type="number" min="0" formControlName="checkout_price" matInput
+                                placeholder="Price">
+                              <mat-error>
+                                {{errors.price_2}}
+                              </mat-error>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="form-array-plus-remove">
+                              <button (click)="removeOtherPrice(l)" type="button" mat-icon-button>
+                                <mat-icon>remove</mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <p>Are there any additional fees your customer should know about?</p>
+              </div>
+              <div class="col-md-6">
+                <mat-radio-group formControlName="additional_fee" (change)="radioChangeAddCharge($event)"
+                  aria-label="Select an option">
+                  <mat-radio-button value="additional_fee_yes">Yes</mat-radio-button>
+                  <mat-radio-button value="additional_fee_no">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="showAdditionalCharge">
+            <div class="list-group-item">
+              <div *ngFor="let pricing of pricingFormA.controls; let i = index" class="list-group list-group-flush">
+
+                <div [formGroup]="pricingFormA.controls[i] | asFormGroup" class="row">
+                  <div class="col-md-3">
+                    <mat-form-field class="form-fields">
+                      <input type="text" formControlName="fee_label" matInput placeholder="Fee Label">
+                      <mat-error>
+                        {{errors.fee_label}}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-3">
+                    <mat-form-field class="form-fields">
+                      <input type="text" formControlName="fees_type" matInput placeholder="Fee Type">
+                      <mat-error>
+                        {{errors.fees_type}}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-3">
+                    <mat-form-field class="form-fields">
+                      <span matPrefix>$ &nbsp;</span>
+                      <input type="number" min="0" formControlName="amount" matInput placeholder="Amount">
+                      <mat-error>
+                        {{errors.price_2}}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-array-plus-remove">
+                      <button type="button" mat-icon-button (click)="onClickPricing($event)" color="primary">
+                        <mat-icon>add</mat-icon>
+                      </button><span class="app-spacer"></span>
+                      <button type="button" *ngIf="i != 0" mat-icon-button (click)="onRemovePricing(i)" color="primary">
+                        <mat-icon>remove</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <span class="app-spacer"> </span>
+      <button class="dialog-btn" mat-raised-button color="primary" type="submit" [disabled]="pricingSetForm.invalid">Set
+        Pricing</button>
+    </mat-card-actions>
+  </form>
+
+</mat-card>
