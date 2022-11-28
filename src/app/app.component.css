@@ -1,0 +1,37 @@
+.form-fields {
+  width: 100%;
+}
+
+.mat-radio-button~.mat-radio-button {
+  margin-left: 16px;
+}
+
+.list-group-item {
+  padding: 0px 16px !important;
+  margin-bottom: -1px !important;
+  background-color: #fff !important;
+  border: 1px solid #ddd !important;
+}
+
+.price-title {
+  padding-left: 16px;
+  padding-top: 16px;
+}
+
+.left-head {
+  padding: 2px;
+  background-color: aliceblue;
+  border-radius: 5px;
+}
+
+.right-head {
+  padding: 2px;
+  background-color: aliceblue;
+  border-radius: 5px;
+}
+
+.form-check {
+  padding-top: 16px;
+  width: 31%;
+  margin: auto;
+}
